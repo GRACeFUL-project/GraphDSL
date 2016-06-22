@@ -47,7 +47,7 @@ regularComb :: Expr -> Item
 regularComb al = Constraint $ Call (userD "regular") [al, IConst 11, IConst 4, Var "trans_comb", IConst 1, SetLit [IConst 9, IConst 10, IConst 11]]
 
 includeRegular :: Item
-includeRegular = Include "regular.mzn"
+includeRegular = Include "\"regular.mzn\";"
 
 varIdent :: Node -> Ident
 varIdent z = "V_" ++ (show z)
