@@ -7,8 +7,8 @@ tinyExample = do
     a <- mkNode "a"
     b <- mkNode "b"
     c <- mkNode "c"
-    link a >+> b >-> c >-> a
-    constrain $ a := M
+    link a >+> b >+> c >+> a
+    constrain $ a := P
 
 smallPowerFailure = do -- page 43
     -- nodes
