@@ -2,6 +2,8 @@ module Examples where
 
 import DSL.GraphDSL
 import DSL.SolverExports
+import DSL.QPNModeler
+import Interfaces.MZPrinter
 
 tinyExample = do
     a <- mkNode "a"
