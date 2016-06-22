@@ -1,12 +1,11 @@
-module QPNModeler where
+module DSL.QPNModeler where
 
 --import Interfaces.MZinHaskell
 import Interfaces.MZAST
 import Interfaces.MZPrinter
-import GraphDSL
-import SolverExports
+import DSL.GraphDSL
+import DSL.SolverExports
 import Data.List
-import Examples
 
 signToInt :: Sign -> Int
 signToInt M = 1
@@ -72,10 +71,6 @@ constraint1a z outs ins = [regularComb $ ArrayLit ([Var $ propIdent y z | (y,s2)
 
 constraint1b :: Node -> [(Node, Sign)] -> [(Node, Sign)] -> [Item]
 constraint1b z outs ins = [regularPlus $ ArrayLit ([Var $ propIdent x z | (x,s) <- (outs ++ ins)] ++ [Var $ varIdent z])]
-
--- 3d arg is out_arcs and 4th arg is in_arcs
---getNodeContexts :: CLD -> [(Node, Maybe Sign, [(Node, Sign)], [(Node, Sign)])]
-workingCLD = getNodeContexts $ compile tinyExample
 
 makePost :: (Node, Maybe Sign, [(Node, Sign)], [(Node, Sign)]) -> [Item]
 makePost (z, Just s, outs, ins) = constraint2 z s outs ins
