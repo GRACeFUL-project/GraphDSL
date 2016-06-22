@@ -6,10 +6,10 @@
 module DSL.ConstraintDSL where
 
 -- The type of constraints we are modelling
-data ConstraintType variables codomain = Equality variables codomain
+data ConstraintType variables codomain = Equality    variables codomain
                                        | Implication (ConstraintType variables codomain)
                                                      (ConstraintType variables codomain)
-                                       | Negation (ConstraintType variables codomain)
+                                       | Negation    (ConstraintType variables codomain)
                                        deriving (Show)
 
 -- The constraint of equality, to make syntax nice
