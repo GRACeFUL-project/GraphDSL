@@ -37,9 +37,11 @@ mkNode n = do
              put $ insNode (i, n) gr
              return i
 
+infixl 0 >-
+
 -- | The general edge constructor
-(>-) :: e -> GraphSyntax n e Name -> Name -> GraphSyntax n e Name
-(>-) e g w = do
+(>-) :: GraphSyntax n e Name -> e -> Name -> GraphSyntax n e Name
+(>-) g e w = do
                v <- g
                gr <- get
                put $ insEdge (v, w, e) gr
