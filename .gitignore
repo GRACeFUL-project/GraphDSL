@@ -4,4 +4,5 @@
 *.swo
 dist
 app
+examples/model*
 .stack-work
