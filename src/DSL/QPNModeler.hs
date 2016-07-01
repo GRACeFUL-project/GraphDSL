@@ -17,30 +17,41 @@ signToInt Q = 4
 transitionPlus :: Item
 transitionPlus
   = Declare (Par, Array [Int,Int] (Par, Int)) "trans_plus"
-            (Just (ArrayLit2D [[IConst 2, IConst 0, IConst 3, IConst 4]
-                              ,[IConst 5, IConst 0, IConst 4, IConst 4]
-                              ,[IConst 4, IConst 0, IConst 6, IConst 4]
-                              ,[IConst 4, IConst 0, IConst 4, IConst 7]
-                              ,[IConst 5, IConst 0, IConst 4, IConst 4]
-                              ,[IConst 4, IConst 0, IConst 6, IConst 4]
-                              ,[IConst 4, IConst 0, IConst 4, IConst 7]]))
+            (Just (ArrayLit2D [[IConst 2, IConst 3, IConst 4, IConst 5]
+                              ,[IConst 6, IConst 2, IConst 5, IConst 5]
+                              ,[IConst 2, IConst 7, IConst 4, IConst 5]
+                              ,[IConst 5, IConst 4, IConst 8, IConst 5]
+                              ,[IConst 5, IConst 5, IConst 5, IConst 9]
+                              ,[IConst 6, IConst 2, IConst 5, IConst 5]
+                              ,[IConst 2, IConst 7, IConst 4, IConst 5]
+                              ,[IConst 5, IConst 4, IConst 8, IConst 5]
+                              ,[IConst 5, IConst 5, IConst 5, IConst 9]]))
 
 -- Transition function for automaton A_x_+
 transitionComb :: Item
 transitionComb
 --  = Declare (Par, Array [Range (IConst 1) (IConst 11), Range (IConst 1) (IConst 4)] (Par, Int)) "trans_comb"
   = Declare (Par, Array [Int, Int] (Par, Int)) "trans_comb"
-            (Just (ArrayLit2D [[IConst 2 , IConst 0, IConst 4 , IConst 3 ]
-                              ,[IConst 8 , IConst 0, IConst 5 , IConst 6 ]
-                              ,[IConst 6 , IConst 0, IConst 6 , IConst 6 ]
-                              ,[IConst 5 , IConst 0, IConst 7 , IConst 6 ]
-                              ,[IConst 10, IConst 0, IConst 6 , IConst 6 ]
-                              ,[IConst 6 , IConst 0, IConst 6 , IConst 10]
-                              ,[IConst 5 , IConst 0, IConst 11, IConst 6 ]
-                              ,[IConst 8 , IConst 0, IConst 9 , IConst 6 ]
-                              ,[IConst 10, IConst 0, IConst 6 , IConst 6 ]
-                              ,[IConst 6 , IConst 0, IConst 6 , IConst 10]
-                              ,[IConst 5 , IConst 0, IConst 11, IConst 6 ]]))
+            (Just (ArrayLit2D [[IConst 2 , IConst 3, IConst 4 , IConst 5 ]
+                              ,[IConst 7 , IConst 6, IConst 11 , IConst 13 ]
+                              ,[IConst 6 , IConst 8, IConst 9 , IConst 12 ]
+                              ,[IConst 11 , IConst 9, IConst 10 , IConst 13 ]
+                              ,[IConst 13, IConst 12, IConst 13 , IConst 13 ]
+                              ,[IConst 7 , IConst 14, IConst 11 , IConst 13]
+                              ,[IConst 7 , IConst 6, IConst 18, IConst 13 ]
+                              ,[IConst 6 , IConst 15, IConst 9 , IConst 12 ]
+                              ,[IConst 11, IConst 16, IConst 10 , IConst 13 ]
+                              ,[IConst 11 , IConst 9, IConst 17 , IConst 13]
+                              ,[IConst 20 , IConst 12, IConst 13 , IConst 13]
+                              ,[IConst 13 , IConst 19, IConst 13 , IConst 13]
+                              ,[IConst 13 , IConst 12, IConst 13 , IConst 20]
+                              ,[IConst 7 , IConst 14, IConst 11 , IConst 13]
+                              ,[IConst 6 , IConst 15, IConst 9 , IConst 12]
+                              ,[IConst 11 , IConst 16, IConst 10 , IConst 13]
+                              ,[IConst 11 , IConst 9, IConst 17 , IConst 13]
+                              ,[IConst 20 , IConst 12, IConst 13 , IConst 13]
+                              ,[IConst 13 , IConst 19, IConst 13 , IConst 13]
+                              ,[IConst 13 , IConst 12, IConst 13, IConst 20]]))
 
 -- Haskell array to MiniZinc array
 translate :: [Int] -> Expr
@@ -48,10 +59,10 @@ translate [] = ArrayLit []
 translate ls = ArrayLit $ map IConst ls
 
 regularPlus :: Expr -> Item
-regularPlus al = Constraint $ Call (userD "regular") [al, IConst 7, IConst 4, Var "trans_plus", IConst 1, SetLit [IConst 5, IConst 6, IConst 7]]
+regularPlus al = Constraint $ Call (userD "regular") [al, IConst 9, IConst 4, Var "trans_plus", IConst 1, SetLit [IConst 6, IConst 7, IConst 8, IConst 9]]
 
 regularComb :: Expr -> Item
-regularComb al = Constraint $ Call (userD "regular") [al, IConst 11, IConst 4, Var "trans_comb", IConst 1, SetLit [IConst 9, IConst 10, IConst 11]]
+regularComb al = Constraint $ Call (userD "regular") [al, IConst 20, IConst 4, Var "trans_comb", IConst 1, SetLit [IConst 14, IConst 15, IConst 16, IConst 17, IConst 18, IConst 19, IConst 20]]
 
 includeRegular :: Item
 includeRegular = Include "regular.mzn"
@@ -73,8 +84,17 @@ constraint2 z s outs ins = [regularComb $ ArrayLit [Var $ varIdent z, IConst $ s
 
 -- Node z not observed
 constraint1a :: Node -> [(Node, Sign)] -> [(Node, Sign)] -> [Item]
-constraint1a z outs ins = [regularComb $ ArrayLit ([Var $ propIdent y z | (y,s2) <- delete (x, s1) (ins ++ outs)] ++ [IConst $ signToInt s1, Var $ propIdent z x]) | (x, s1) <- outs] ++
-                          [regularComb $ ArrayLit ([Var $ propIdent y z | (y,s2) <- outs] ++ [IConst $ signToInt s1, Var $ propIdent z x]) | (x, s1) <- ins]
+constraint1a z outs ins = (constraint1a1 z outs ins) ++
+                          (constraint1a2 z outs ins)
+
+constraint1a1 :: Node -> [(Node, Sign)] -> [(Node, Sign)] -> [Item]
+constraint1a1 z [(x, s1)] [] = [regularComb $ ArrayLit [IConst $ signToInt Z, IConst $ signToInt s1, Var $ propIdent z x]]
+constraint1a1 z [] [(x, s1)] = [regularComb $ ArrayLit [IConst $ signToInt Z, IConst $ signToInt s1, Var $ propIdent z x]]
+constraint1a1 z outs ins     = [regularComb $ ArrayLit ([Var $ propIdent y z | (y,s2) <- delete (x, s1) (ins ++ outs)] ++ [IConst $ signToInt s1, Var $ propIdent z x]) | (x, s1) <- outs]
+
+constraint1a2 :: Node -> [(Node, Sign)] -> [(Node, Sign)] -> [Item]
+constraint1a2 z [] ins   = [regularComb $ ArrayLit [IConst $ signToInt Z, IConst $ signToInt s1, Var $ propIdent z x] | (x, s1) <- ins]
+constraint1a2 z outs ins = [regularComb $ ArrayLit ([Var $ propIdent y z | (y,s2) <- outs] ++ [IConst $ signToInt s1, Var $ propIdent z x]) | (x, s1) <- ins]
 
 constraint1b :: Node -> [(Node, Sign)] -> [(Node, Sign)] -> [Item]
 constraint1b z outs ins = [regularPlus $ ArrayLit ([Var $ propIdent x z | (x,s) <- (outs ++ ins)] ++ [Var $ varIdent z])]
