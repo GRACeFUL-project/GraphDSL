@@ -1,4 +1,6 @@
-module QPNModeler where
+module QPNModeler (
+  iSolveCLD
+) where
 
 import Interfaces.MZAST
 import Interfaces.MZinHaskell
