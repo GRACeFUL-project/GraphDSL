@@ -12,6 +12,7 @@ module DSL.GraphDSL (
     CLD (..),
     Sign (..),
 
+    GraphSyntax,
     -- Graph syntax
     mkNode,
     (>+>),
@@ -19,12 +20,12 @@ module DSL.GraphDSL (
     (>?>),
     link,
     constrain,
-    
+
     -- Compilation
     compile,
     compileGraph,
     compileConstraints,
-    
+
     -- Printing and visualization
     prettify,
     prettyPrint,
@@ -39,7 +40,7 @@ import Data.GraphViz hiding (Graph)
 import Data.Text.Lazy hiding (head)
 
 -- | Gives an identifier for a node
-type Name = Node 
+type Name = Node
 
 -- | Gives the sign of influence {+, -, 0, ?}
 data Sign = P | M | Z | Q deriving (Ord, Eq)
@@ -55,7 +56,7 @@ instance Show Sign where
 instance Labellable Sign where
     toLabelValue = textLabelValue . pack . show
 
--- | A type for requirements 
+-- | A type for requirements
 data Requirement = S Sign deriving (Show)
 
 -- | We need to be able to lift Signs into Requirements
@@ -99,7 +100,7 @@ makeEdge s g w = do
                     v <- g
                     cld <- get
                     put $ cld { graph = insEdge (v, w, s) (graph cld) }
-                    return w 
+                    return w
 
 -- | Add a constraint
 constrain :: (IsConstraint Name Requirement c) => c -> GraphSyntax ()
@@ -107,7 +108,7 @@ constrain c = do
                 cld <- get
                 put $ cld { constraints = toConstraint c : constraints cld }
 
--- | Syntactic sugar 
+-- | Syntactic sugar
 link :: a -> GraphSyntax a
 link = return
 
@@ -117,7 +118,7 @@ initialState = CLD G.empty []
 
 -- | Compile the graph
 compile :: GraphSyntax a -> CLD
-compile gs = snd $ runState gs initialState
+compile gs = execState gs initialState
 
 -- | Extract a graph from a syntax
 compileGraph :: GraphSyntax a -> Graph
