@@ -1,5 +1,4 @@
-module DSL.QPNModeler
-   - -- exports mainly solveCLD (but the rest kept visible while debugging)
+module DSL.QPNModeler where
 
 import Interfaces.MZAST
 import Interfaces.MZinHaskell
