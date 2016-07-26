@@ -84,7 +84,7 @@ declareVars :: [(Node, Maybe Sign, [(Node, Sign)], [(Node, Sign)])] -> [Item]
 declareVars [] = []
 declareVars ((z, ms, outs, ins):rs) = 
   Declare  (Dec, Int) (varIdent z) (mapMaybe (IConst . signToInt) ms)
-  : declareVars rs ++ declarePropVars outs ins z
+  : declareVars rs ++ declarePropVars outs z
 
 -- Declare propagation variables for each edge
 declarePropVars outs z =
