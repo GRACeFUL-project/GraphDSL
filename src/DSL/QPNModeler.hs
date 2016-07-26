@@ -1,16 +1,32 @@
 module DSL.QPNModeler where
 
+import qualified Data.Map as M
 import Interfaces.MZAST
 import Interfaces.MZinHaskell
+import Interfaces.FZSolutionParser
 import DSL.SolverExports
+import DSL.GraphDSL
 import Data.List
---import DSL.Examples
+import Data.Graph.Inductive as G hiding (mkNode, Graph)
 
 signToInt :: Sign -> Int
 signToInt M = 1
 signToInt Z = 2
 signToInt P = 3
 signToInt Q = 4
+
+intToSign :: Int -> Sign
+intToSign 1 = M
+intToSign 2 = Z
+intToSign 3 = P
+intToSign 4 = Q
+
+solveAndRelabel :: GraphSyntax a -> IO Graph
+solveAndRelabel g = do
+                        let cld = compile g
+                        let cnstr = constraints cld
+                        solution <- fmap head $ solveCLD cld
+                        return $ gmap (\(a, n, (s, m), b) -> (a, n, (s ++ (maybe (maybe "" ((", "++) . show) (getObservedSign cnstr n)) (\(MInt i) -> (", "++) (show (intToSign i))) (M.lookup ("V_"++(show n)) solution)), m), b)) (graph cld)
 
 -- Transition function for automaton A_+
 transitionPlus :: Item

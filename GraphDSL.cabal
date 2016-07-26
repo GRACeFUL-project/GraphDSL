@@ -24,5 +24,6 @@ library
                        fgl,
                        mtl,
                        text,
-                       haskelzinc
+                       haskelzinc,
+                       containers
   default-language:    Haskell2010

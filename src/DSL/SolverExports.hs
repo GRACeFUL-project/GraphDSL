@@ -3,11 +3,13 @@ module DSL.SolverExports (
     CLD,
     Node,
     Sign (..),
+    Graph,
 
     -- Utility functions
-    getNodeContexts
+    getNodeContexts,
+    getObservedSign
 ) where
-import Data.Graph.Inductive.Graph
+import Data.Graph.Inductive.Graph hiding (Graph)
 import DSL.ConstraintDSL
 import DSL.GraphDSL
 

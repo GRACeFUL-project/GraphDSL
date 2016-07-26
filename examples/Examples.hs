@@ -9,7 +9,9 @@ tinyExample = do
     a <- mkNode "a"
     b <- mkNode "b"
     c <- mkNode "c"
-    link a >+> b >+> c >+> a
+    d <- mkNode "d"
+    link a >~+> b >+> c >-> a
+    link c >+> d
     constrain $ a := P
 
 smallPowerFailure = do -- page 43
@@ -143,7 +145,6 @@ medicalExample = do
     link alcohol >--> strength
     link alcohol >++> fun
     link hiking >++> fun
-    link hiking >+> fun
     link hiking >-> obesity
     link exercise >++> strength
     link obesity >-> strength
