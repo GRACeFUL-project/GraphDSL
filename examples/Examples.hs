@@ -2,6 +2,8 @@ module Examples where
 
 import DSL.GraphDSL
 import DSL.SolverExports
+import DSL.QPNModeler
+import Data.Map
 
 tinyExample = do
     a <- mkNode "a"
@@ -83,6 +85,8 @@ dutchCoastalZone2080 = do
     qualityLife<- mkNode "Quality of living in coastal zone"
     qualityNature<-mkNode"Quality of nature in coastal zone"
     qualityRecre<-mkNode "Quality of recreation in coastal zone"
+    
+    constrain $ deltaworks := P
   
     link sand        >-> floodrisk
     link deltaworks  >-> floodrisk
@@ -105,6 +109,44 @@ dutchCoastalZone2080 = do
     link nuclear     >+> energyProd
     link energyProd  >-> qualityNature
     link energyProd  >-> qualityRecre
+
+medicalExample = do
+    
+    -- Actions
+    diet        <- mkNode "Diet"
+    exercise    <- mkNode "Exercise"
+    b_blockers  <- mkNode "Beta Blockers"
+    alcohol     <- mkNode "Alcohol"
+    hiking      <- mkNode "Hiking"
+
+    -- External Factors
+    history     <- mkNode "Family history of Heart Disease"
+
+    -- Internal Factors
+    obesity     <- mkNode "Obesity"
+    bp          <- mkNode "Blood Pressure"
+    cholesterol <- mkNode "Cholesterol"
+
+    -- Objectives
+    fun         <- mkNode "Fun"
+    strength    <- mkNode "Strength"
+    heart_d     <- mkNode "Heart Disease"
+
+    -- Links
+    link diet >--> cholesterol >+> heart_d
+    link diet >-> fun
+    link history >+> heart_d
+    link diet >--> obesity >++> heart_d
+    link exercise >-> obesity >++> bp >+> heart_d
+    link b_blockers >--> bp
+    link alcohol >+> bp
+    link alcohol >--> strength
+    link alcohol >++> fun
+    link hiking >++> fun
+    link hiking >+> fun
+    link hiking >-> obesity
+    link exercise >++> strength
+    link obesity >-> strength
 
 test1 = compile smallPowerFailure
 test2 = compile coastalManagement

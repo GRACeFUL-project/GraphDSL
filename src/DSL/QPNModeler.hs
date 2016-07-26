@@ -138,7 +138,4 @@ makeModel cld@(l:ls) = [includeRegular, Empty] ++
                        concatMap makePost cld ++ [Empty, Solve Satisfy]
                        
 iSolveCLD cld = iTestModel $ makeModel (getNodeContexts cld)
-solveCLD cld = do
-  putStrLn "Minizinc filepath:"
-  p <- getLine
-  testModel (makeModel (getNodeContexts cld)) p "" "fd" ""
+solveCLD cld = testModel (makeModel (getNodeContexts cld)) "model.mzn" "" "fd" ""

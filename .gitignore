@@ -5,3 +5,6 @@
 dist
 app
 .stack-work
+examples/*mzn*
+examples/*fzn*
+examples/*ozn*

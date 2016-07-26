@@ -12,11 +12,13 @@ module DSL.GraphDSL (
     CLD (..),
     Sign (..),
 
-    GraphSyntax,
     -- Graph syntax
+    GraphSyntax,
     mkNode,
     (>+>),
     (>->),
+    (>++>),
+    (>-->),
     (>?>),
     link,
     constrain,
@@ -42,15 +44,19 @@ import Data.Text.Lazy hiding (head)
 -- | Gives an identifier for a node
 type Name = Node
 
--- | Gives the sign of influence {+, -, 0, ?}
-data Sign = P | M | Z | Q deriving (Ord, Eq)
+-- | Gives the sign of influence {+, ++, +?, -, --, -?, 0, ?}
+data Sign = P | PP | PQ | M | MM | MQ | Z | Q deriving (Ord, Eq)
 
 -- | Convert a sign to a string
 instance Show Sign where
-    show P = "+"
-    show M = "-"
-    show Z = "0"
-    show Q = "?"
+    show P  = "+"
+    show PP = "++"
+    show PQ = "+?"
+    show M  = "-"
+    show MM = "--"
+    show MQ = "-?"
+    show Z  = "0"
+    show Q  = "?"
 
 -- | Label a sign
 instance Labellable Sign where
@@ -77,7 +83,10 @@ type GraphSyntax a = State CLD a
 
 -- fixity
 infixl >+>
+infixl >++>
 infixl >->
+infixl >-->
+infixl >?>
 
 -- | Create a new node
 mkNode :: String -> GraphSyntax Name
@@ -89,10 +98,12 @@ mkNode s = do
              return i
 
 -- | Create a new edge
-(>+>), (>->), (>?>) :: GraphSyntax Name -> Name -> GraphSyntax Name
-(>+>) = makeEdge P
-(>->) = makeEdge M
-(>?>) = makeEdge Q
+(>+>), (>->), (>++>), (>-->), (>?>) :: GraphSyntax Name -> Name -> GraphSyntax Name
+(>+>)  = makeEdge P
+(>++>) = makeEdge PP
+(>->)  = makeEdge M
+(>-->) = makeEdge MM
+(>?>)  = makeEdge Q
 
 -- | Factor out the commonality in >x>
 makeEdge :: Sign -> GraphSyntax Name -> Name -> GraphSyntax Name
