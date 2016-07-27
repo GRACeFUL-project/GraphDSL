@@ -126,16 +126,16 @@ mkNode s = do
              return i
 
 -- | Create a new edge
-(>+>)  = makeEdge P Im
-(>++>) = makeEdge PP Im
-(>->)  = makeEdge M Im
-(>-->) = makeEdge MM Im
-(>?>)  = makeEdge Q Im
+(>+>)   = makeEdge P Im
+(>->)   = makeEdge M Im
+(>?>)   = makeEdge Q Im
+(>++>)  = makeEdge PP Im
+(>-->)  = makeEdge MM Im
 (>~+>)  = makeEdge P Future 
-(>~++>) = makeEdge PP Future 
 (>~->)  = makeEdge M Future 
-(>~-->) = makeEdge MM Future 
 (>~?>)  = makeEdge Q Future 
+(>~++>) = makeEdge PP Future 
+(>~-->) = makeEdge MM Future 
 
 -- | Factor out the commonality in >x>
 makeEdge :: Sign -> TimeFrame -> GraphSyntax Name -> Name -> GraphSyntax Name
@@ -173,7 +173,7 @@ compile gs = CLDG (nfilter (\n -> 0 /= (length (neighbors g n))) g) constrs
         listConstrTemporal = [ (n, (s, t)) | (Equality n (ST (s, t))) <- constr]
         constrs = filter removeTemporal constr ++
             [
-                if guardThing then
+                if futureEdge then
                     toConstraint $ (n+(if t == Future then minNode else 0)) := s
                 else
                     toConstraint $ n := s
@@ -188,14 +188,19 @@ compile gs = CLDG (nfilter (\n -> 0 /= (length (neighbors g n))) g) constrs
         gra' = nmap (\s -> (s, Nothing)) $ emap fst gra
         -- The minimum value for the new node
         minNode = head $ newNodes 1 gra
-        guardThing = any (\(_, _, (_, t)) -> t /= Im) $ labEdges gra
+
+        -- Is there an edge to the near future
+        futureEdge = any (\(_, _, (_, t)) -> t /= Im) $ labEdges gra
+
+
         newNs = map (\(n, a) -> (n+minNode, (a++"'", Just n))) (labNodes gra)
         newEs = map (\(sr, si, (s, t)) -> if t == Im then
                                                     (sr+minNode, si+minNode, (s, Im))
                                                   else (sr, si+minNode, (s, Im))
                     ) (labEdges gra)
+
         weirdGraph = foldl (flip insEdge) (foldl (flip insNode) (nmap (\s -> (s, Nothing)) gra) newNs) newEs
-        g = if guardThing then
+        g = if futureEdge then
                 emap fst $ delEdges
                     (map (\(a, b, _) -> (a, b)) $
                      filter (\(_, _, (x, y)) -> y /= Im) $
