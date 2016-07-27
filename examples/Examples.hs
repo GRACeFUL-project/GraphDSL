@@ -9,10 +9,10 @@ tinyExample = do
     a <- mkNode "a"
     b <- mkNode "b"
     c <- mkNode "c"
-    d <- mkNode "d"
-    link a >~+> b >+> c >-> a
-    link c >+> d
-    constrain $ a := P
+
+    -- A temporal feedback loop
+    link a >+> b >+> c >~-> a
+    constrain $ a := (M, Future)
 
 smallPowerFailure = do -- page 43
     -- nodes
@@ -32,10 +32,13 @@ coastalManagement = do -- page 66 fig. 4.4
     measuresToPreventFlooding <- mkNode "measures to prevent flooding"
     ecologyInTheCoastalZone   <- mkNode "ecology in the coastal zone"
     -- edges
-    link seaLevelRise >+> riskOfFlooding >+> flooding >+> measuresToPreventFlooding
+    link seaLevelRise >~+> riskOfFlooding >+> flooding >+> measuresToPreventFlooding
     link measuresToPreventFlooding >-> ecologyInTheCoastalZone
-    link measuresToPreventFlooding >-> riskOfFlooding
+    link measuresToPreventFlooding >~-> riskOfFlooding
     link investments >+> measuresToPreventFlooding
+
+    constrain $ seaLevelRise := (P, Im)
+    constrain $ seaLevelRise := (Z, Future)
 
 -- The graph from https://dl.dropboxusercontent.com/u/49395289/Graph%20A.png
 exampleGraphWithCycles = do
@@ -68,7 +71,10 @@ exampleGraphWithCycles = do
     d4 <- mkNode "d4"
     d5 <- mkNode "d5"
     link d >+> d1 >-> d2 >+> d3 >+> d
-    link d >-> d4 >?> d5 >+> d
+    link d >-> d4 >+> d5 >+> d
+
+    constrain $ a := P
+    constrain $ c := P
 
 dutchCoastalZone2080 = do
     sand       <- mkNode "Suppletion of sand"
