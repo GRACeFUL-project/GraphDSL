@@ -23,10 +23,15 @@ intToSign 4 = Q
 
 solveAndRelabel :: GraphSyntax a -> IO Graph
 solveAndRelabel g = do
-                        let cld = compile g
-                        let cnstr = constraints cld
-                        solution <- fmap head $ solveCLD cld
-                        return $ gmap (\(a, n, (s, m), b) -> (a, n, (s ++ (maybe (maybe "" ((", "++) . show) (getObservedSign cnstr n)) (\(MInt i) -> (", "++) (show (intToSign i))) (M.lookup ("V_"++(show n)) solution)), m), b)) (graph cld)
+  let cld = compile g
+  let cnstr = constraints cld
+  solution <- fmap head $ solveCLD cld
+  let helper n = maybe (maybe "" ((", "++) . show) (getObservedSign cnstr n))
+                       (\(MInt i) -> (", "++) (show (intToSign i)))
+                       (M.lookup ("V_"++(show n)) solution)
+  return $ gmap (\(a, n, (s,             m), b) ->
+                  (a, n, (s ++ helper n, m), b))
+                (graph cld)
 
 -- Transition function for automaton A_+
 transitionPlus :: Item
@@ -98,14 +103,14 @@ mapMaybe = fmap
 
 declareVars :: [(Node, Maybe Sign, [(Node, Sign)], [(Node, Sign)])] -> [Item]
 declareVars [] = []
-declareVars ((z, ms, outs, ins):rs) = 
+declareVars ((z, ms, outs, ins):rs) =
   Declare  (Dec, Int) (varIdent z) (mapMaybe (IConst . signToInt) ms)
   : declareVars rs ++ declarePropVars outs z
 
 -- Declare propagation variables for each edge
 declarePropVars outs z =
   -- A propagation variable on the direction of the edge
-  [Declare (Dec, Range (IConst 0) (IConst 4)) (propIdentD z n) Nothing | (n,_) <- outs] ++ 
+  [Declare (Dec, Range (IConst 0) (IConst 4)) (propIdentD z n) Nothing | (n,_) <- outs] ++
   -- and one to the opposite direction
   [Declare (Dec, Range (IConst 0) (IConst 4)) (propIdentOD z n) Nothing | (n,_) <- outs]
 
@@ -131,16 +136,16 @@ constraint1a1 z outs ins     =
                            [IConst $ signToInt s1, Var $ propIdentD z x]) | (x, s1) <- outs]
 
 constraint1a2 :: Node -> [(Node, Sign)] -> [(Node, Sign)] -> [Item]
-constraint1a2 z [] ins   = 
+constraint1a2 z [] ins   =
   [regularComb $ ArrayLit [IConst $ signToInt Z, IConst $ signToInt s1, Var $ propIdentOD x z]
   | (x, s1) <- ins]
 constraint1a2 z outs ins =
-  [regularComb $ ArrayLit ([Var $ propIdentOD z y | (y,_) <- outs] ++ 
+  [regularComb $ ArrayLit ([Var $ propIdentOD z y | (y,_) <- outs] ++
   [IConst $ signToInt s1, Var $ propIdentOD x z]) | (x, s1) <- ins]
 
 constraint1b :: Node -> [(Node, Sign)] -> [(Node, Sign)] -> [Item]
 constraint1b z outs ins = [regularPlus $ ArrayLit ([Var $ propIdentOD z x | (x,s) <- outs] ++
-                                                   [Var $ propIdentD x z | (x,s) <- ins] ++ 
+                                                   [Var $ propIdentD x z | (x,s) <- ins] ++
                                                    [Var $ varIdent z]) ]
 
 makePost :: (Node, Maybe Sign, [(Node, Sign)], [(Node, Sign)]) -> [Item]
@@ -149,9 +154,9 @@ makePost (z, Nothing, outs, ins) = constraint1a z outs ins ++ constraint1b z out
 
 makeModel :: [(Node, Maybe Sign, [(Node, Sign)], [(Node, Sign)])] -> MZModel
 makeModel cld@(l:ls) = [includeRegular, Empty] ++
-                       declareVars cld ++ 
-                       [Empty, transitionPlus, Empty, transitionComb, Empty] ++ 
+                       declareVars cld ++
+                       [Empty, transitionPlus, Empty, transitionComb, Empty] ++
                        concatMap makePost cld ++ [Empty, Solve Satisfy]
-                       
+
 iSolveCLD cld = iTestModel $ makeModel (getNodeContexts cld)
 solveCLD cld = testModel (makeModel (getNodeContexts cld)) "model.mzn" "" "fd" ""
