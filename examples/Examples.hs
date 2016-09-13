@@ -1,5 +1,6 @@
 module Examples where
 
+import Data.GraphViz
 import DSL.GraphDSL
 import DSL.SolverExports
 import DSL.QPNModeler
@@ -32,9 +33,11 @@ coastalManagement = do -- page 66 fig. 4.4
     measuresToPreventFlooding <- mkNode "measures to prevent flooding"
     ecologyInTheCoastalZone   <- mkNode "ecology in the coastal zone"
     -- edges
-    link seaLevelRise >~+> riskOfFlooding >+> flooding >+> measuresToPreventFlooding
+--    link seaLevelRise >~+> riskOfFlooding >+> flooding >+> measuresToPreventFlooding
+    link seaLevelRise >+> riskOfFlooding >+> flooding >+> measuresToPreventFlooding
     link measuresToPreventFlooding >-> ecologyInTheCoastalZone
-    link measuresToPreventFlooding >~-> riskOfFlooding
+--    link measuresToPreventFlooding >~-> riskOfFlooding
+    link measuresToPreventFlooding >-> riskOfFlooding
     link investments >+> measuresToPreventFlooding
 
     constrain $ seaLevelRise := (P, Im)
@@ -50,12 +53,12 @@ exampleGraphWithCycles = do
     a5 <- mkNode "a5"
     link a >+> a1 >-> a2 >+> a3 >-> a
     link a >+> a4 >+> a5 >+> a
-  
+
     b  <- mkNode "b"
     c  <- mkNode "c"
     d  <- mkNode "d"
     link a >+> b >+> c >+> d
-  
+
     c1 <- mkNode "c1"
     c2 <- mkNode "c2"
     c3 <- mkNode "c3"
@@ -64,7 +67,7 @@ exampleGraphWithCycles = do
     link c2 >+> c1
     link c2 >+> c
     link c >+> c3 >+> c4 >+> c
-  
+
     d1 <- mkNode "d1"
     d2 <- mkNode "d2"
     d3 <- mkNode "d3"
@@ -93,9 +96,9 @@ dutchCoastalZone2080 = do
     qualityLife<- mkNode "Quality of living in coastal zone"
     qualityNature<-mkNode"Quality of nature in coastal zone"
     qualityRecre<-mkNode "Quality of recreation in coastal zone"
-    
+
     constrain $ deltaworks := P
-  
+
     link sand        >-> floodrisk
     link deltaworks  >-> floodrisk
     link rivers      >-> floodrisk
@@ -119,7 +122,7 @@ dutchCoastalZone2080 = do
     link energyProd  >-> qualityRecre
 
 medicalExample = do
-    
+
     -- Actions
     diet        <- mkNode "Diet"
     exercise    <- mkNode "Exercise"
@@ -158,3 +161,23 @@ medicalExample = do
 test1 = compile smallPowerFailure
 test2 = compile coastalManagement
 test3 = compile exampleGraphWithCycles
+
+save1 = saveGraphPdf (compileGraph smallPowerFailure)      "smallPowerFailure.pdf"
+save2 = saveGraphPdf (compileGraph coastalManagement)      "coastalManagement.pdf"
+save3 = saveGraphPdf (compileGraph exampleGraphWithCycles) "exampleGraphWithCycles.pdf"
+
+main = save1 >> save1 >> save3
+
+----------------
+
+-- | Quickly visualise a graph as pdf
+-- saveGraphPdf :: (Ord el, Graph gr, Labellable nl, Labellable el) =>
+--                 gr nl el -> FilePath -> IO ()
+saveGraphPdf g name = ign $ runGraphviz dg Pdf name
+  where
+    dg = setDirectedness graphToDot params g
+    params = nonClusteredParams { fmtNode = \ (_,l)     -> [toLabel l]
+                                , fmtEdge = \ (_, _, l) -> [toLabel l]
+                                }
+
+    ign = (>> return ())
