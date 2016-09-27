@@ -25,10 +25,10 @@ solveAndRelabel :: GraphSyntax a -> IO Graph
 solveAndRelabel g = do
   let cld = compile g
   let cnstr = constraints cld
-  solution <- fmap head $ solveCLD cld
+  solution <- fmap (either (error . show) head) $ solveCLD cld
   let helper n = maybe (maybe "" ((", "++) . show) (getObservedSign cnstr n))
                        (\(MInt i) -> (", "++) (show (intToSign i)))
-                       (M.lookup ("V_"++(show n)) solution)
+                       (lookup ("V_"++(show n)) solution)
   return $ gmap (\(a, n, (s,             m), b) ->
                   (a, n, (s ++ helper n, m), b))
                 (graph cld)
@@ -159,4 +159,4 @@ makeModel cld@(l:ls) = [includeRegular, Empty] ++
                        concatMap makePost cld ++ [Empty, Solve Satisfy]
 
 iSolveCLD cld = iTestModel $ makeModel (getNodeContexts cld)
-solveCLD cld = testModel (makeModel (getNodeContexts cld)) "model.mzn" "" "fd" ""
+solveCLD cld = testModel (makeModel (getNodeContexts cld)) "model.mzn" 1 1 -- the first one is the FD solver and the second the number of solutions
