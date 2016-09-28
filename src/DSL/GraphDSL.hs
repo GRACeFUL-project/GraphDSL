@@ -36,6 +36,7 @@ module DSL.GraphDSL (
     compile,
     compileGraph,
     compileConstraints,
+    ignoreTime,
 
     -- Printing and visualization
     prettify,
@@ -216,3 +217,10 @@ compileGraph = graph . compile
 -- | Extract the constraints from a syntax
 compileConstraints :: GraphSyntax a -> [Constraint]
 compileConstraints = constraints . compile
+
+-- | Ignore time in the CLD
+ignoreTime :: GraphSyntax a -> GraphSyntax ()
+ignoreTime gs = do
+                    gs
+                    state <- get
+                    put $ state {graph = emap (\(s, _) -> (s, Im)) (graph state)}
