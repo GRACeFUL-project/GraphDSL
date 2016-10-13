@@ -33,15 +33,15 @@ coastalManagement = do -- page 66 fig. 4.4
     measuresToPreventFlooding <- mkNode "measures to prevent flooding"
     ecologyInTheCoastalZone   <- mkNode "ecology in the coastal zone"
     -- edges
---    link seaLevelRise >~+> riskOfFlooding >+> flooding >+> measuresToPreventFlooding
-    link seaLevelRise >+> riskOfFlooding >+> flooding >+> measuresToPreventFlooding
+    link seaLevelRise >~+> riskOfFlooding >+> flooding >+> measuresToPreventFlooding
+    --link seaLevelRise >+> riskOfFlooding >+> flooding >+> measuresToPreventFlooding
     link measuresToPreventFlooding >-> ecologyInTheCoastalZone
---    link measuresToPreventFlooding >~-> riskOfFlooding
-    link measuresToPreventFlooding >-> riskOfFlooding
+    link measuresToPreventFlooding >~-> riskOfFlooding
+    --link measuresToPreventFlooding >-> riskOfFlooding
     link investments >+> measuresToPreventFlooding
 
-    constrain $ seaLevelRise := (P, Im)
-    constrain $ seaLevelRise := (Z, Future)
+    constrain $ flooding := (P, Im)
+    --constrain $ flooding := (Z, Future)
 
 -- The graph from https://dl.dropboxusercontent.com/u/49395289/Graph%20A.png
 exampleGraphWithCycles = do
