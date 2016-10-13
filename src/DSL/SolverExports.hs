@@ -25,6 +25,24 @@ getNodeContexts cld = map (\n -> (n, getObservedSign (constraints cld) n, outs n
 getObservedSign :: [Constraint] -> Node -> Maybe Sign
 getObservedSign xs x = safeHead [c | Equality v (S c) <- xs, v == x]
 
+-- Get actions
+getActions :: CLD -> [(Node, [(Sign, Int)])]
+getActions = getActions' . constraints
+
+getActions' :: [Constraint] -> [(Node, [(Sign, Int)])]
+getActions' [] = [] 
+getActions' ((Action n rest):xs) = (n, rest):(getActions' xs)
+getActions' (x:xs) = getActions' xs
+
+-- Get goals
+getGoals :: CLD -> [(Node, [(Sign, Int)])]
+getGoals = getGoals' . constraints
+
+getGoals' :: [Constraint] -> [(Node, [(Sign, Int)])]
+getGoals' [] = [] 
+getGoals' ((Goal n rest):xs) = (n, rest):(getGoals' xs)
+getGoals' (x:xs) = getGoals' xs
+
 -- Safe head of a list
 safeHead :: [a] -> Maybe a
 safeHead []     = Nothing

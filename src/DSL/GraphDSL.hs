@@ -8,6 +8,8 @@ module DSL.GraphDSL (
     Implication (..),
     InEquality (..),
     Constraint,
+    action,
+    goal,
     Requirement (..),
     Graph,
     CLD,
@@ -88,7 +90,7 @@ instance Lifts (Sign, TimeFrame) Requirement where
     lift = ST
 
 -- | A type for constraints
-type Constraint = ConstraintType Name Requirement
+type Constraint = ConstraintType Sign Name Requirement
 
 -- | A Time interval
 data TimeFrame = Im | Future deriving (Ord, Eq, Show)
@@ -147,7 +149,7 @@ makeEdge s t g w = do
                     return w
 
 -- | Add a constraint
-constrain :: (IsConstraint Name Requirement c) => c -> GraphSyntax ()
+constrain :: (IsConstraint Sign Name Requirement c) => c -> GraphSyntax ()
 constrain c = do
                 cld <- get
                 put $ cld { constraints = toConstraint c : constraints cld }
@@ -224,3 +226,11 @@ ignoreTime gs = do
                     gs
                     state <- get
                     put $ state {graph = emap (\(s, _) -> (s, Im)) (graph state)}
+
+-- | Declare something a goal
+goal :: Name -> [(Sign, Int)] -> GraphSyntax () 
+goal n lst = constrain $ (Goal n lst :: ConstraintType Sign Name Requirement)
+
+-- | Declare something an action
+action :: Name -> [(Sign, Int)] -> GraphSyntax ()
+action n lst = constrain $ (Action n lst :: ConstraintType Sign Name Requirement)

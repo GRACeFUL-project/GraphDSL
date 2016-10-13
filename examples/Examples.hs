@@ -13,7 +13,10 @@ tinyExample = do
 
     -- A temporal feedback loop
     link a >+> b >+> c >~-> a
+
     constrain $ a := (M, Future)
+    action a [(M, 1), (P, 2)]
+    goal b [(P, 2), (M, -2)]
 
 smallPowerFailure = do -- page 43
     -- nodes
