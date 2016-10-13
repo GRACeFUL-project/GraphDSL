@@ -10,6 +10,8 @@ data ConstraintType variables codomain = Equality    variables codomain
                                        | Implication (ConstraintType variables codomain)
                                                      (ConstraintType variables codomain)
                                        | Negation    (ConstraintType variables codomain)
+                                       | Goal        variables [(codomain, codomain)]
+                                       | Action      variables [(codomain, codomain)]
                                        deriving (Show)
 
 -- The constraint of equality, to make syntax nice
@@ -29,7 +31,7 @@ class IsConstraint name liftedCodomain c where
 class Lifts a b where
     lift :: a -> b
 
--- If a type is a constraint, theen the type lifts
+-- If a type is a constraint, then the type lifts
 instance (IsConstraint name codomain c) => Lifts c (ConstraintType name codomain) where
     lift = toConstraint
 
