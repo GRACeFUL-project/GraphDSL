@@ -12,8 +12,8 @@ tinyExample = do
     c <- mkNode "c"
 
     -- A temporal feedback loop
-    link a >+> b >+> c >~-> a
-    constrain $ a := (M, Future)
+    link a >+> b >+> c
+    constrain $ a := M
 
 smallPowerFailure = do -- page 43
     -- nodes
@@ -74,7 +74,7 @@ exampleGraphWithCycles = do
     d4 <- mkNode "d4"
     d5 <- mkNode "d5"
     link d >+> d1 >-> d2 >+> d3 >+> d
-    link d >-> d4 >+> d5 >+> d
+    link d >~-> d4 >+> d5 >+> d
 
     constrain $ a := P
     constrain $ c := P
