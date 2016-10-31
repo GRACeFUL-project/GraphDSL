@@ -19,6 +19,7 @@ module DSL.GraphDSL (
     -- Graph syntax
     GraphSyntax,
     mkNode,
+    makeEdge,
     (>+>),
     (>->),
     (>++>),
@@ -37,6 +38,7 @@ module DSL.GraphDSL (
     compileGraph,
     compileConstraints,
     ignoreTime,
+    initialState,
 
     -- Printing and visualization
     prettify,
@@ -96,7 +98,8 @@ data TimeFrame = Im | Future deriving (Ord, Eq, Show)
 -- | Graphs
 type Graph = Gr (String, Maybe Node) Sign
 
--- | A CLD is the graph, the signs associated with the edges and the constraints (and the names of the nodes)
+-- | A CLD is the graph, the signs associated with the edges and the constraints 
+-- (and the names of the nodes)
 data CLDG n e = CLDG {graph :: Gr n e, constraints :: [Constraint]} deriving (Show)
 
 -- | A CLD is a specialiced general cld.......
@@ -162,7 +165,7 @@ initialState = CLDG G.empty []
 
 -- | Compile the graph
 compile :: GraphSyntax a -> CLD
-compile gs = CLDG (nfilter (\n -> 0 /= (length (neighbors g n))) g) constrs
+compile gs = CLDG (nfilter (\n -> 0 /= length (neighbors g n)) g) constrs
     where
         -- General CLD
         cldg = execState gs initialState

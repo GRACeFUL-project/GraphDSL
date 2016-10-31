@@ -25,5 +25,6 @@ library
                        mtl,
                        text,
                        haskelzinc,
-                       containers
+                       containers,
+                       aeson
   default-language:    Haskell2010
